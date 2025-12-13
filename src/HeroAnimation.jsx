@@ -608,11 +608,11 @@ const HeroAnimation = () => {
                                                                                                                                                     setTimeout(() => {
                                                                                                                                                         detayliRaporlaRightLineControl.start("slideLeft");
                                                                                                                                                         setTimeout(() => {
-                                                                                                                                                            bunlarinHepsiControl.start("visible");
                                                                                                                                                             detayliRaporlaRightLineControl.start("shrinkRight");
+                                                                                                                                                            // Text appears 0.5s after shrink completes (0.8s)
                                                                                                                                                             setTimeout(() => {
-                                                                                                                                                                bunlarinHepsiRightLineControl.start("visible");
-                                                                                                                                                            }, 500);
+                                                                                                                                                                bunlarinHepsiControl.start("visible");
+                                                                                                                                                            }, 1300);
                                                                                                                                                         }, 600);
                                                                                                                                                     }, 150);
                                                                                                                                                 }, 800);
@@ -2661,7 +2661,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Ürünleri optimize et
+                Ürünü parlat
             </motion.div>
 
             {/* Ürünleri optimize et right-side green line */}
@@ -2767,7 +2767,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Sosyal medyayı hazırla
+                İçeriği planla
             </motion.div>
 
             {/* Sosyal medyayı hazırla right-side green line */}
@@ -2923,28 +2923,6 @@ const HeroAnimation = () => {
             >
                 Bunların hepsini Yosuun yapar.
             </motion.div>
-
-            {/* Bunların hepsini Yosuun yapar. right-side green line */}
-            <motion.div
-                className="absolute h-3 rounded-full flex items-center"
-                style={{
-                    backgroundColor: '#78F666',
-                    top: '50%',
-                    left: '69%',
-                    transform: 'translateY(-50%)',
-                    transformOrigin: 'left center',
-                    width: '100vw'
-                }}
-                initial={{ scaleX: 0 }}
-                animate={bunlarinHepsiRightLineControl}
-                variants={{
-                    hidden: { scaleX: 0 },
-                    visible: {
-                        scaleX: 1,
-                        transition: { duration: 0.8, ease: "easeOut" }
-                    }
-                }}
-            />
         </motion.div >
     );
 };
