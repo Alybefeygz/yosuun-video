@@ -5,11 +5,26 @@ import logo2 from './assets/logo2.png';
 import ajansLogo from '../ajans.png';
 import girisimciLogo from '../girişimci.png';
 import saticiLogo from '../satıcı.png';
+import handImage from './assets/hand.png';
 
 const HeroAnimation = () => {
     const [useLogo2, setUseLogo2] = useState(false);
     const [useGirisimci, setUseGirisimci] = useState(false);
     const [useSatici, setUseSatici] = useState(false);
+    const [currentWordIndex, setCurrentWordIndex] = useState(0);
+    const [showCyclingWords, setShowCyclingWords] = useState(false);
+    const [isCentered, setIsCentered] = useState(false);
+    const [useLogoInsteadOfHand, setUseLogoInsteadOfHand] = useState(false);
+    const [useSonraFont, setUseSonraFont] = useState(false);
+
+    // Words that cycle through - 5 complete loops (3 decreasing + 2 fixed)
+    const cyclingWords = [
+        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
+        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
+        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
+        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
+        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS'
+    ];
     const logoControls = useAnimation();
     const hControl = useAnimation();
     const asControl = useAnimation(); // Control for 'as'
@@ -29,6 +44,37 @@ const HeroAnimation = () => {
     const bizControl = useAnimation();
     const zatenControl = useAnimation();
     const underlineControl = useAnimation();
+    const stresControl = useAnimation(); // Control for STRES on black screen
+    const boyleKalmakControl = useAnimation(); // Control for 'Böyle kalmak zorunda değil.'
+    const akilTextControl = useAnimation(); // Control for 'Akıl' (slides left)
+    const artikControl = useAnimation(); // Control for 'artık' (slides right then exits)
+    const ondaControl = useAnimation(); // Control for 'onda.' (slides right then exits)
+    const artikOndaControl = useAnimation(); // Control for 'artık onda.' combined (for initial animations)
+    const handControl = useAnimation(); // Control for hand image
+    const handLinesControl = useAnimation(); // Control for decorative lines around hand
+    const bundanSonraControl = useAnimation(); // Control for 'Bundan sonra iş böyle ilerler' text
+    const magazalarBaglaControl = useAnimation(); // Control for 'Mağazaları bağla' container
+    const magazalarTextControl = useAnimation(); // Control for 'Mağazaları bağla' text only
+    const magazalarLineControl = useAnimation(); // Control for green line
+    const tekEkrandaGorControl = useAnimation(); // Control for 'Tek ekranda gör' text
+    const topLeftLineControl = useAnimation(); // Control for top-left green line
+    const rightLineControl = useAnimation(); // Control for right-side green line
+    const rakipleriIzleControl = useAnimation(); // Control for 'Rakipleri izle' text
+    const rakipleriRightLineControl = useAnimation(); // Control for Rakipleri izle right line
+    const analizEtControl = useAnimation(); // Control for 'Analiz et' text
+    const analizEtRightLineControl = useAnimation(); // Control for Analiz et right line
+    const urunleriOptimizeControl = useAnimation(); // Control for 'Ürünleri optimize et' text
+    const urunleriOptimizeRightLineControl = useAnimation(); // Control for Ürünleri optimize et right line
+    const stokuPlanlaControl = useAnimation(); // Control for 'Stoku planla' text
+    const stokuPlanlaRightLineControl = useAnimation(); // Control for Stoku planla right line
+    const sosyalMedyaHazirlaControl = useAnimation(); // Control for 'Sosyal medyayı hazırla' text
+    const sosyalMedyaHazirlaRightLineControl = useAnimation(); // Control for Sosyal medyayı hazırla right line
+    const sureciTakipControl = useAnimation(); // Control for 'Süreci takip et' text
+    const sureciTakipRightLineControl = useAnimation(); // Control for Süreci takip et right line
+    const detayliRaporlaControl = useAnimation(); // Control for 'Detaylı raporla' text
+    const detayliRaporlaRightLineControl = useAnimation(); // Control for Detaylı raporla right line
+    const bunlarinHepsiControl = useAnimation(); // Control for 'Bunların hepsini Yosuun yapar.' text
+    const bunlarinHepsiRightLineControl = useAnimation(); // Control for final right line
 
     const onuControl = useAnimation();
     const yaptikControl = useAnimation(); // Control for 'yaptık'
@@ -76,6 +122,8 @@ const HeroAnimation = () => {
     const tekUnderlineControl = useAnimation(); // Control for "tek" underline
     const kimOlursanOlControl = useAnimation(); // Control for "kim olursan ol" text
     const ajansLogoControl = useAnimation(); // Control for ajans logo
+    const buYasadiginControl = useAnimation(); // Control for "Bu yaşadığın şey" text
+    const cyclingWordsControl = useAnimation(); // Control for cycling words container
 
     // Variants for decorative lines staggered animation
     const lineVariants = {
@@ -369,6 +417,238 @@ const HeroAnimation = () => {
             // Wait 1 second then switch to satıcı logo
             await new Promise(resolve => setTimeout(resolve, 1000));
             setUseSatici(true);
+
+            // Wait 1 second then vanish everything and change background to white
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            kimOlursanOlControl.start("instantVanish");
+            ajansLogoControl.start("instantVanish");
+            bgControl.start("white");
+            buYasadiginControl.start("visible");
+            setShowCyclingWords(true);
+
+            // Start cycling through words immediately
+
+            // Cycle through all words (30 total - 5 loops of 6 words)
+            // First 3 loops (words 1-17): delay decreases from 1000ms to 250ms
+            // Last 2 loops (words 18-29): fixed at 250ms
+            for (let i = 1; i < 30; i++) {
+                let delay;
+                if (i < 18) {
+                    // First 3 loops: gradually decrease from 1000ms to 250ms
+                    const startDelay = 1000;
+                    const endDelay = 250;
+                    const totalSteps = 17;
+                    delay = startDelay - ((startDelay - endDelay) / (totalSteps - 1)) * (i - 1);
+                } else {
+                    // Last 2 loops: fixed at 250ms
+                    delay = 250;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                setCurrentWordIndex(i);
+            }
+
+            // After all loops complete: black background, hide everything, show STRES
+            setShowCyclingWords(false); // Hide the cycling words
+            bgControl.start("black");
+            buYasadiginControl.start("instantVanish");
+            stresControl.start("visible"); // Show STRES instantly centered
+
+            // Wait 1 second then STRES slides left, wait for it to finish, then 'Böyle kalmak zorunda değil.' slides in
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            stresControl.start("slideLeft"); // STRES slides left and disappears
+            await new Promise(resolve => setTimeout(resolve, 300)); // Wait for STRES animation to complete
+            boyleKalmakControl.start("visible"); // 'Böyle kalmak zorunda değil.' slides in from right
+
+            // Wait 1 second then 'Böyle kalmak zorunda değil.' slides up and disappears
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            boyleKalmakControl.start("slideUp"); // Text slides up and disappears
+            await new Promise(resolve => setTimeout(resolve, 300)); // Wait for animation to complete
+            bgControl.start("green"); // Background changes to green
+            akilTextControl.start("visible"); // 'Akıl' slides up
+            artikControl.start("visible"); // 'artık' slides up
+            ondaControl.start("visible"); // 'onda.' slides up
+
+            // Wait 1 second then split: 'Akıl' slides left, 'artık onda.' slides right, hand appears
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            akilTextControl.start("slideLeft"); // 'Akıl' slides left
+            artikControl.start("slideRight"); // 'artık' slides right
+            ondaControl.start("slideRight"); // 'onda.' slides right
+            handControl.start("visible"); // Hand image appears in the middle
+            handLinesControl.start("visible"); // Decorative lines appear around hand
+
+            // Wait 1 second then background changes from green to white instantly
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            bgControl.start("whiteInstant"); // Background instantly changes to white
+            handLinesControl.start("greenColor"); // Lines change color to green
+            setUseLogoInsteadOfHand(true); // Swap hand image with logo.png
+
+            // Wait 1 second then elements slide left and disappear sequentially
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            // 1. Akıl slides left first
+            akilTextControl.start("exitLeft");
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // 2. Logo and 6 lines slide left
+            handControl.start("exitLeft");
+            handLinesControl.start("exitLeft");
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // 3. artık slides left
+            artikControl.start("exitLeft");
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // 4. onda. slides left
+            ondaControl.start("exitLeft");
+
+            // Wait for exit animation to complete, then background turns green instantly
+            await new Promise(resolve => setTimeout(resolve, 300));
+            bgControl.start("green");
+            bundanSonraControl.start("visible"); // Show 'Bundan sonra iş böyle ilerler' text
+            // Change sonra font to Permanent Marker at 1.1s (same time as color change)
+            setTimeout(() => setUseSonraFont(true), 1100);
+            // After all animations complete (1.7s), make everything disappear instantly and change background to white
+            setTimeout(() => {
+                bundanSonraControl.start("exitInstant");
+                setUseSonraFont(false); // Reset sonra font and hide underline
+                bgControl.start("whiteInstant"); // Background changes to white instantly
+                magazalarBaglaControl.start("visible"); // Show 'Mağazaları bağla' container
+                magazalarTextControl.start("visible"); // Show text with slide animation
+                magazalarLineControl.start("visible"); // Start line animation
+                // After line animation completes (0.4s delay + 0.8s duration = 1.2s), text slides left and disappears
+                setTimeout(() => {
+                    magazalarTextControl.start("exitLeft");
+                    // After text exits (0.3s), line slides left
+                    setTimeout(() => {
+                        magazalarLineControl.start("slideLeft");
+                        // After line slides left (0.6s), show 'Tek ekranda gör' text and shrink left line
+                        setTimeout(() => {
+                            tekEkrandaGorControl.start("visible");
+                            magazalarLineControl.start("shrinkRight"); // Shrink at same time as text appears
+                            // Right side line appears 0.5s after text
+                            setTimeout(() => {
+                                rightLineControl.start("visible");
+                                // After right line completes (0.8s), start Rakipleri izle transition
+                                setTimeout(() => {
+                                    // Tek ekranda gör exits
+                                    tekEkrandaGorControl.start("exitLeft");
+                                    // After text exits (0.15s), right line slides left
+                                    setTimeout(() => {
+                                        rightLineControl.start("slideLeft");
+                                        // After line slides left (0.6s), show Rakipleri izle + shrink line
+                                        setTimeout(() => {
+                                            rakipleriIzleControl.start("visible");
+                                            rightLineControl.start("shrinkRight");
+                                            // New right line appears 0.5s after text
+                                            setTimeout(() => {
+                                                rakipleriRightLineControl.start("visible");
+                                                // After Rakipleri right line completes (0.8s), start Analiz et transition
+                                                setTimeout(() => {
+                                                    // Rakipleri izle exits
+                                                    rakipleriIzleControl.start("exitLeft");
+                                                    // After text exits (0.15s), right line slides left
+                                                    setTimeout(() => {
+                                                        rakipleriRightLineControl.start("slideLeft");
+                                                        // After line slides left (0.6s), show Analiz et + shrink line
+                                                        setTimeout(() => {
+                                                            analizEtControl.start("visible");
+                                                            rakipleriRightLineControl.start("shrinkRight");
+                                                            // New right line appears 0.5s after text
+                                                            setTimeout(() => {
+                                                                analizEtRightLineControl.start("visible");
+                                                                // After Analiz et right line completes, start Ürünleri optimize et transition
+                                                                setTimeout(() => {
+                                                                    analizEtControl.start("exitLeft");
+                                                                    setTimeout(() => {
+                                                                        analizEtRightLineControl.start("slideLeft");
+                                                                        setTimeout(() => {
+                                                                            urunleriOptimizeControl.start("visible");
+                                                                            analizEtRightLineControl.start("shrinkRight");
+                                                                            setTimeout(() => {
+                                                                                urunleriOptimizeRightLineControl.start("visible");
+                                                                                // After Ürünleri optimize et, start Stoku planla transition
+                                                                                setTimeout(() => {
+                                                                                    urunleriOptimizeControl.start("exitLeft");
+                                                                                    setTimeout(() => {
+                                                                                        urunleriOptimizeRightLineControl.start("slideLeft");
+                                                                                        setTimeout(() => {
+                                                                                            stokuPlanlaControl.start("visible");
+                                                                                            urunleriOptimizeRightLineControl.start("shrinkRight");
+                                                                                            setTimeout(() => {
+                                                                                                stokuPlanlaRightLineControl.start("visible");
+                                                                                                // After Stoku planla, start Sosyal medyayı hazırla transition
+                                                                                                setTimeout(() => {
+                                                                                                    stokuPlanlaControl.start("exitLeft");
+                                                                                                    setTimeout(() => {
+                                                                                                        stokuPlanlaRightLineControl.start("slideLeft");
+                                                                                                        setTimeout(() => {
+                                                                                                            sosyalMedyaHazirlaControl.start("visible");
+                                                                                                            stokuPlanlaRightLineControl.start("shrinkRight");
+                                                                                                            setTimeout(() => {
+                                                                                                                sosyalMedyaHazirlaRightLineControl.start("visible");
+                                                                                                                // After Sosyal medyayı hazırla, start Süreci takip et transition
+                                                                                                                setTimeout(() => {
+                                                                                                                    sosyalMedyaHazirlaControl.start("exitLeft");
+                                                                                                                    setTimeout(() => {
+                                                                                                                        sosyalMedyaHazirlaRightLineControl.start("slideLeft");
+                                                                                                                        setTimeout(() => {
+                                                                                                                            sureciTakipControl.start("visible");
+                                                                                                                            sosyalMedyaHazirlaRightLineControl.start("shrinkRight");
+                                                                                                                            setTimeout(() => {
+                                                                                                                                sureciTakipRightLineControl.start("visible");
+                                                                                                                                // After Süreci takip et, start Detaylı raporla transition
+                                                                                                                                setTimeout(() => {
+                                                                                                                                    sureciTakipControl.start("exitLeft");
+                                                                                                                                    setTimeout(() => {
+                                                                                                                                        sureciTakipRightLineControl.start("slideLeft");
+                                                                                                                                        setTimeout(() => {
+                                                                                                                                            detayliRaporlaControl.start("visible");
+                                                                                                                                            sureciTakipRightLineControl.start("shrinkRight");
+                                                                                                                                            setTimeout(() => {
+                                                                                                                                                detayliRaporlaRightLineControl.start("visible");
+                                                                                                                                                // After Detaylı raporla, start Bunların hepsini Yosuun yapar. transition
+                                                                                                                                                setTimeout(() => {
+                                                                                                                                                    detayliRaporlaControl.start("exitLeft");
+                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                        detayliRaporlaRightLineControl.start("slideLeft");
+                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                            bunlarinHepsiControl.start("visible");
+                                                                                                                                                            detayliRaporlaRightLineControl.start("shrinkRight");
+                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                bunlarinHepsiRightLineControl.start("visible");
+                                                                                                                                                            }, 500);
+                                                                                                                                                        }, 600);
+                                                                                                                                                    }, 150);
+                                                                                                                                                }, 800);
+                                                                                                                                            }, 500);
+                                                                                                                                        }, 600);
+                                                                                                                                    }, 150);
+                                                                                                                                }, 800);
+                                                                                                                            }, 500);
+                                                                                                                        }, 600);
+                                                                                                                    }, 150);
+                                                                                                                }, 800);
+                                                                                                            }, 500);
+                                                                                                        }, 600);
+                                                                                                    }, 150);
+                                                                                                }, 800);
+                                                                                            }, 500);
+                                                                                        }, 600);
+                                                                                    }, 150);
+                                                                                }, 800);
+                                                                            }, 500);
+                                                                        }, 600);
+                                                                    }, 150);
+                                                                }, 800);
+                                                            }, 500);
+                                                        }, 600);
+                                                    }, 150);
+                                                }, 800);
+                                            }, 500);
+                                        }, 600);
+                                    }, 150);
+                                }, 800);
+                            }, 500);
+                        }, 600);
+                    }, 150);
+                }, 1300);
+            }, 2100);
         };
         sequence();
     }, [logoControls, hControl, asControl, aControl, plControl, anControl, toControl, maControl, keControl, promiseControl, carControl, bonControl, neutControl, tralControl, dotControl, bekleControl, hayirControl, boxControl, bizControl, zatenControl, underlineControl, onuControl, yaptikControl, checkControl, herControl, seControl, yiControl, yapControl, makControl, icinControl, tControl, eControl, kControl, finalLogoControl, ekoControl, tekContainerControl]);
@@ -514,6 +794,10 @@ const HeroAnimation = () => {
                 },
                 black: {
                     backgroundColor: "#000000",
+                    transition: { duration: 0 }
+                },
+                whiteInstant: {
+                    backgroundColor: "#ffffff",
                     transition: { duration: 0 }
                 }
             }}
@@ -1023,7 +1307,7 @@ const HeroAnimation = () => {
                     <motion.svg
                         className="absolute inset-0 w-full h-full z-0 pointer-events-none decorative-lines"
                         viewBox="-60 -60 120 120"
-                        style={{ overflow: 'visible' }}
+                        style={{ overflow: 'visible', marginLeft: '-3px' }}
                         initial="hidden"
                         animate={finalLogoControl}
                         variants={{
@@ -1537,6 +1821,10 @@ const HeroAnimation = () => {
                     slideLeft: {
                         x: 0,
                         transition: { duration: 0.3, ease: "easeOut" }
+                    },
+                    instantVanish: {
+                        opacity: 0,
+                        transition: { duration: 0 }
                     }
                 }}
             >
@@ -1565,6 +1853,10 @@ const HeroAnimation = () => {
                         hidden: { opacity: 0 },
                         visible: {
                             opacity: 1,
+                            transition: { duration: 0 }
+                        },
+                        instantVanish: {
+                            opacity: 0,
                             transition: { duration: 0 }
                         }
                     }}
@@ -1629,6 +1921,1030 @@ const HeroAnimation = () => {
                     />
                 </motion.div>
             </motion.div>
+
+            {/* "bu yaşadığın şey" Text - slides left and disappears at 2nd GERÇEK */}
+            <motion.div
+                className="absolute top-1/2 transform -translate-y-1/2 text-4xl md:text-6xl font-bold text-black tracking-tight flex items-center"
+                style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', left: 'calc(50% - 300px)' }}
+                initial="hidden"
+                animate={buYasadiginControl}
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                        opacity: 1,
+                        transition: { duration: 0 }
+                    },
+                    slideLeftExit: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.5, ease: "easeIn" }
+                    },
+                    instantVanish: {
+                        opacity: 0,
+                        transition: { duration: 0 }
+                    }
+                }}
+            >
+                <span className="whitespace-nowrap">bu yaşadığın şey </span>
+            </motion.div>
+
+            {/* Cycling words - only shows when background is white */}
+            {showCyclingWords && (
+                <motion.div
+                    className="absolute inset-0 flex items-center justify-start text-4xl md:text-6xl font-bold tracking-tight"
+                    initial={{ x: 880 }}
+                    animate={cyclingWordsControl}
+                    variants={{
+                        center: {
+                            x: 0,
+                            transition: { duration: 0.5, ease: "easeOut" }
+                        },
+                        centerInstant: {
+                            x: 0,
+                            transition: { duration: 0 }
+                        }
+                    }}
+                >
+                    <motion.span
+                        key={currentWordIndex}
+                        className="inline-block"
+                        style={{ fontFamily: '"Permanent Marker", cursive', color: '#78F666' }}
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -100, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                    >
+                        {cyclingWords[currentWordIndex]}
+                    </motion.span>
+                </motion.div>
+            )}
+
+            {/* STRES text on black screen - appears instantly centered, then slides left like Sosyal Medya */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold"
+                initial="hidden"
+                animate={stresControl}
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                        opacity: 1,
+                        transition: { duration: 0 }
+                    },
+                    slideLeft: {
+                        x: -100,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                <span style={{ fontFamily: '"Permanent Marker", cursive', color: '#78F666' }}>
+                    STRES
+                </span>
+            </motion.div>
+
+            {/* 'Böyle kalmak zorunda değil.' text - slides in from right like Sosyal Medya */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-white"
+                initial="hidden"
+                animate={boyleKalmakControl}
+                variants={{
+                    hidden: { opacity: 0, x: 100 },
+                    visible: {
+                        opacity: 1,
+                        x: 0,
+                        transition: { duration: 0.3, ease: "easeOut" }
+                    },
+                    slideUp: {
+                        opacity: 0,
+                        y: -100,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Böyle kalmak zorunda değil.
+            </motion.div>
+
+            {/* 'Akıl artık onda.' container - Akıl slides left, artık onda slides right, hand appears in middle */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                {/* 'Akıl' text - slides up then slides left */}
+                <motion.span
+                    className="text-4xl md:text-6xl font-bold text-black mr-2"
+                    initial="hidden"
+                    animate={akilTextControl}
+                    variants={{
+                        hidden: { opacity: 0, y: 100 },
+                        visible: {
+                            opacity: 1,
+                            y: 0,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        slideLeft: {
+                            x: -80,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        exitLeft: {
+                            x: -200,
+                            opacity: 0,
+                            transition: { duration: 0.3, ease: "easeIn" }
+                        }
+                    }}
+                >
+                    Akıl
+                </motion.span>
+
+                {/* Hand image / Logo - appears in middle (absolute so it doesn't take space when hidden) */}
+                <motion.img
+                    src={useLogoInsteadOfHand ? logo : handImage}
+                    alt={useLogoInsteadOfHand ? "logo" : "hand"}
+                    className="absolute h-40 md:h-64 object-contain z-10"
+                    style={{ left: '34.43%', transform: 'translateX(-100%)' }}
+                    initial="hidden"
+                    animate={handControl}
+                    variants={{
+                        hidden: { opacity: 0, scale: 0 },
+                        visible: {
+                            opacity: 1,
+                            scale: 1,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        exitLeft: {
+                            x: -200,
+                            opacity: 0,
+                            transition: { duration: 0.3, ease: "easeIn" }
+                        }
+                    }}
+                />
+
+                {/* Decorative white lines around hand - same as tek ekosistem */}
+                <motion.svg
+                    className="absolute z-0 pointer-events-none"
+                    style={{ left: '42.93%', transform: 'translateX(-50%) translateY(-3px)', width: '200px', height: '200px' }}
+                    viewBox="-60 -60 120 120"
+                    initial="hidden"
+                    animate={handLinesControl}
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: { opacity: 1, transition: { duration: 0 } },
+                        exitLeft: {
+                            opacity: 0,
+                            transition: { duration: 0.3, ease: "easeIn" }
+                        }
+                    }}
+                >
+                    {/* Top Right */}
+                    <motion.line
+                        initial={{ x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" }}
+                        animate={handLinesControl}
+                        variants={{
+                            hidden: { x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" },
+                            visible: {
+                                x1: 35, y1: -45, x2: 28, y2: -38, opacity: 1, stroke: "white",
+                                transition: { delay: 0, duration: 0.4, ease: "circOut" }
+                            },
+                            greenColor: {
+                                stroke: "#78F666",
+                                transition: { duration: 0 }
+                            },
+                            exitLeft: {
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        strokeWidth="4" strokeLinecap="round" />
+                    {/* Bottom Left */}
+                    <motion.line
+                        initial={{ x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" }}
+                        animate={handLinesControl}
+                        variants={{
+                            hidden: { x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" },
+                            visible: {
+                                x1: -35, y1: 45, x2: -28, y2: 38, opacity: 1, stroke: "white",
+                                transition: { delay: 0, duration: 0.4, ease: "circOut" }
+                            },
+                            greenColor: {
+                                stroke: "#78F666",
+                                transition: { duration: 0 }
+                            },
+                            exitLeft: {
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        strokeWidth="4" strokeLinecap="round" />
+                    {/* Top Left */}
+                    <motion.line
+                        initial={{ x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" }}
+                        animate={handLinesControl}
+                        variants={{
+                            hidden: { x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" },
+                            visible: {
+                                x1: -35, y1: -45, x2: -28, y2: -38, opacity: 1, stroke: "white",
+                                transition: { delay: 0.15, duration: 0.4, ease: "circOut" }
+                            },
+                            greenColor: {
+                                stroke: "#78F666",
+                                transition: { duration: 0 }
+                            },
+                            exitLeft: {
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        strokeWidth="4" strokeLinecap="round" />
+                    {/* Bottom Right */}
+                    <motion.line
+                        initial={{ x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" }}
+                        animate={handLinesControl}
+                        variants={{
+                            hidden: { x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" },
+                            visible: {
+                                x1: 35, y1: 45, x2: 28, y2: 38, opacity: 1, stroke: "white",
+                                transition: { delay: 0.15, duration: 0.4, ease: "circOut" }
+                            },
+                            greenColor: {
+                                stroke: "#78F666",
+                                transition: { duration: 0 }
+                            },
+                            exitLeft: {
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        strokeWidth="4" strokeLinecap="round" />
+                    {/* Top Center */}
+                    <motion.line
+                        initial={{ x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" }}
+                        animate={handLinesControl}
+                        variants={{
+                            hidden: { x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" },
+                            visible: {
+                                x1: 0, y1: -52, x2: 0, y2: -45, opacity: 1, stroke: "white",
+                                transition: { delay: 0.3, duration: 0.4, ease: "circOut" }
+                            },
+                            greenColor: {
+                                stroke: "#78F666",
+                                transition: { duration: 0 }
+                            },
+                            exitLeft: {
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        strokeWidth="4" strokeLinecap="round" />
+                    {/* Bottom Center */}
+                    <motion.line
+                        initial={{ x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" }}
+                        animate={handLinesControl}
+                        variants={{
+                            hidden: { x1: 0, y1: 0, x2: 0, y2: 0, opacity: 0, stroke: "white" },
+                            visible: {
+                                x1: 0, y1: 52, x2: 0, y2: 45, opacity: 1, stroke: "white",
+                                transition: { delay: 0.3, duration: 0.4, ease: "circOut" }
+                            },
+                            greenColor: {
+                                stroke: "#78F666",
+                                transition: { duration: 0 }
+                            },
+                            exitLeft: {
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        strokeWidth="4" strokeLinecap="round" />
+                </motion.svg>
+
+                {/* 'artık' text - slides up then slides right, then exits left */}
+                <motion.span
+                    className="text-4xl md:text-6xl font-bold text-black"
+                    initial="hidden"
+                    animate={artikControl}
+                    variants={{
+                        hidden: { opacity: 0, y: 100 },
+                        visible: {
+                            opacity: 1,
+                            y: 0,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        slideRight: {
+                            x: 60,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        exitLeft: {
+                            x: -200,
+                            opacity: 0,
+                            transition: { duration: 0.3, ease: "easeIn" }
+                        }
+                    }}
+                >
+                    artık
+                </motion.span>
+                {/* Space between artık and onda. */}
+                <span className="text-4xl md:text-6xl font-bold text-black">&nbsp;</span>
+                {/* 'onda.' text - slides up then slides right, then exits left */}
+                <motion.span
+                    className="text-4xl md:text-6xl font-bold text-black"
+                    initial="hidden"
+                    animate={ondaControl}
+                    variants={{
+                        hidden: { opacity: 0, y: 100 },
+                        visible: {
+                            opacity: 1,
+                            y: 0,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        slideRight: {
+                            x: 60,
+                            transition: { duration: 0.3, ease: "easeOut" }
+                        },
+                        exitLeft: {
+                            x: -200,
+                            opacity: 0,
+                            transition: { duration: 0.3, ease: "easeIn" }
+                        }
+                    }}
+                >
+                    onda.
+                </motion.span>
+            </div>
+            {/* 'Bundan sonra iş böyle ilerler' text - appears with staggered slide-in animation on green background */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold"
+                initial="hidden"
+                animate={bundanSonraControl}
+                variants={{
+                    hidden: {},
+                    visible: {},
+                    exitInstant: {
+                        opacity: 0,
+                        transition: { duration: 0 }
+                    }
+                }}
+            >
+                <motion.span
+                    initial={{ x: 75, opacity: 0, color: "#000000" }}
+                    variants={{
+                        hidden: { x: 75, opacity: 0, color: "#000000" },
+                        visible: {
+                            x: 0,
+                            opacity: 1,
+                            color: "#ffffff",
+                            transition: {
+                                x: { duration: 0.3, ease: "easeOut", delay: 0 },
+                                opacity: { duration: 0.3, ease: "easeOut", delay: 0 },
+                                color: { duration: 0, delay: 1.1, type: "tween" }
+                            }
+                        }
+                    }}
+                >Bundan</motion.span>
+                <div className="relative flex flex-col items-center" style={{ marginLeft: '0.3em' }}>
+                    <motion.span
+                        style={{
+                            color: '#000000',
+                            fontFamily: useSonraFont ? '"Permanent Marker", cursive' : 'inherit'
+                        }}
+                        initial={{ x: 75, y: -50, opacity: 0 }}
+                        variants={{
+                            hidden: { x: 75, y: -50, opacity: 0 },
+                            visible: {
+                                x: 0,
+                                y: 0,
+                                opacity: 1,
+                                transition: {
+                                    x: { duration: 0.3, ease: "easeOut", delay: 0.15 },
+                                    opacity: { duration: 0.3, ease: "easeOut", delay: 0.15 },
+                                    y: { duration: 0.3, ease: "easeOut", delay: 0.9 }
+                                }
+                            }
+                        }}
+                    >sonra</motion.span>
+                    {/* Underline for sonra - same style as ZATEN */}
+                    <motion.svg
+                        className="absolute top-full mt-1 w-full h-4"
+                        viewBox="0 0 100 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        preserveAspectRatio="none"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: useSonraFont ? 1 : 0 }}
+                    >
+                        <motion.path
+                            d="M 5 10 Q 50 15 95 5"
+                            stroke="#ffffff"
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                            fill="none"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: useSonraFont ? 1 : 0 }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                        />
+                    </motion.svg>
+                </div>
+                <motion.span
+                    style={{ marginLeft: '0.3em' }}
+                    initial={{ x: 75, y: 50, opacity: 0, color: "#000000" }}
+                    variants={{
+                        hidden: { x: 75, y: 50, opacity: 0, color: "#000000" },
+                        visible: {
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                            color: "#ffffff",
+                            transition: {
+                                x: { duration: 0.3, ease: "easeOut", delay: 0.3 },
+                                opacity: { duration: 0.3, ease: "easeOut", delay: 0.3 },
+                                y: { duration: 0.3, ease: "easeOut", delay: 0.9 },
+                                color: { duration: 0, delay: 1.1, type: "tween" }
+                            }
+                        }
+                    }}
+                >iş</motion.span>
+                <motion.span
+                    style={{ marginLeft: '0.3em' }}
+                    initial={{ x: 75, y: -50, opacity: 0, color: "#000000" }}
+                    variants={{
+                        hidden: { x: 75, y: -50, opacity: 0, color: "#000000" },
+                        visible: {
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                            color: "#ffffff",
+                            transition: {
+                                x: { duration: 0.3, ease: "easeOut", delay: 0.45 },
+                                opacity: { duration: 0.3, ease: "easeOut", delay: 0.45 },
+                                y: { duration: 0.3, ease: "easeOut", delay: 0.9 },
+                                color: { duration: 0, delay: 1.1, type: "tween" }
+                            }
+                        }
+                    }}
+                >böyle</motion.span>
+                <motion.span
+                    style={{ marginLeft: '0.3em' }}
+                    initial={{ x: 75, opacity: 0, color: "#000000" }}
+                    variants={{
+                        hidden: { x: 75, opacity: 0, color: "#000000" },
+                        visible: {
+                            x: 0,
+                            opacity: 1,
+                            color: "#ffffff",
+                            transition: {
+                                x: { duration: 0.3, ease: "easeOut", delay: 0.6 },
+                                opacity: { duration: 0.3, ease: "easeOut", delay: 0.6 },
+                                color: { duration: 0, delay: 1.1, type: "tween" }
+                            }
+                        }
+                    }}
+                >ilerler</motion.span>
+            </motion.div>
+
+            {/* 'Mağazaları bağla' text - appears instantly on white background */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={magazalarBaglaControl}
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                        opacity: 1,
+                        transition: { duration: 0 }
+                    }
+                }}
+            >
+                <div className="relative flex">
+                    {/* Text wrapper that can exit independently */}
+                    <motion.div
+                        className="flex"
+                        initial="hidden"
+                        animate={magazalarTextControl}
+                        variants={{
+                            hidden: {},
+                            visible: {},
+                            exitLeft: {
+                                x: -200,
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                    >
+                        <motion.span
+                            initial={{ y: -50, opacity: 0 }}
+                            variants={{
+                                hidden: { y: -50, opacity: 0 },
+                                visible: {
+                                    y: 0,
+                                    opacity: 1,
+                                    transition: { duration: 0.3, ease: "easeOut", delay: 0 }
+                                }
+                            }}
+                        >Mağazaları</motion.span>
+                        <motion.span
+                            style={{ marginLeft: '0.3em' }}
+                            initial={{ y: -50, opacity: 0 }}
+                            variants={{
+                                hidden: { y: -50, opacity: 0 },
+                                visible: {
+                                    y: 0,
+                                    opacity: 1,
+                                    transition: { duration: 0.3, ease: "easeOut", delay: 0.15 }
+                                }
+                            }}
+                        >bağla</motion.span>
+                    </motion.div>
+                    {/* Green line extending to the right - positioned at the end of text */}
+                    <motion.div
+                        className="absolute top-1/2 h-3 rounded-l-full flex items-center"
+                        style={{
+                            backgroundColor: '#78F666',
+                            width: '100vw',
+                            left: '100%',
+                            marginLeft: '16px',
+                            transform: 'translateY(-50%)',
+                            transformOrigin: 'right center'
+                        }}
+                        initial={{ scaleX: 0 }}
+                        animate={magazalarLineControl}
+                        variants={{
+                            hidden: { scaleX: 0, transformOrigin: 'left center' },
+                            visible: {
+                                scaleX: 1,
+                                transformOrigin: 'left center',
+                                transition: { duration: 0.8, ease: "easeOut", delay: 0.4 }
+                            },
+                            slideLeft: {
+                                x: '-137vw',
+                                transition: { duration: 0.6, ease: "easeIn" }
+                            },
+                            shrinkRight: {
+                                scaleX: 0,
+                                transformOrigin: 'right center',
+                                transition: { duration: 0.8, ease: "easeIn" }
+                            }
+                        }}
+                    />
+                </div>
+            </motion.div>
+
+            {/* 'Tek ekranda gör' text - slides in from right */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={tekEkrandaGorControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Tek ekranda gör
+            </motion.div>
+
+            {/* Right-side green line extending from text to right edge */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={rightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Rakipleri izle text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={rakipleriIzleControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Rakipleri izle
+            </motion.div>
+
+            {/* Rakipleri izle right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={rakipleriRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Analiz et text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={analizEtControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Analiz et
+            </motion.div>
+
+            {/* Analiz et right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={analizEtRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Ürünleri optimize et text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={urunleriOptimizeControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Ürünleri optimize et
+            </motion.div>
+
+            {/* Ürünleri optimize et right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={urunleriOptimizeRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Stoku planla text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={stokuPlanlaControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Stoku planla
+            </motion.div>
+
+            {/* Stoku planla right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={stokuPlanlaRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Sosyal medyayı hazırla text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={sosyalMedyaHazirlaControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Sosyal medyayı hazırla
+            </motion.div>
+
+            {/* Sosyal medyayı hazırla right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={sosyalMedyaHazirlaRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Süreci takip et text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={sureciTakipControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Süreci takip et
+            </motion.div>
+
+            {/* Süreci takip et right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={sureciTakipRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Detaylı raporla text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={detayliRaporlaControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    exitLeft: {
+                        x: -200,
+                        opacity: 0,
+                        transition: { duration: 0.3, ease: "easeIn" }
+                    }
+                }}
+            >
+                Detaylı raporla
+            </motion.div>
+
+            {/* Detaylı raporla right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={detayliRaporlaRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    },
+                    slideLeft: {
+                        x: '-137vw',
+                        transition: { duration: 0.6, ease: "easeIn" }
+                    },
+                    shrinkRight: {
+                        scaleX: 0,
+                        transformOrigin: 'right center',
+                        transition: { duration: 0.8, ease: "easeIn" }
+                    }
+                }}
+            />
+
+            {/* Bunların hepsini Yosuun yapar. text */}
+            <motion.div
+                className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
+                initial="hidden"
+                animate={bunlarinHepsiControl}
+                variants={{
+                    hidden: { x: 100, opacity: 0 },
+                    visible: {
+                        x: 0,
+                        opacity: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    }
+                }}
+            >
+                Bunların hepsini Yosuun yapar.
+            </motion.div>
+
+            {/* Bunların hepsini Yosuun yapar. right-side green line */}
+            <motion.div
+                className="absolute h-3 rounded-full flex items-center"
+                style={{
+                    backgroundColor: '#78F666',
+                    top: '50%',
+                    left: '69%',
+                    transform: 'translateY(-50%)',
+                    transformOrigin: 'left center',
+                    width: '100vw'
+                }}
+                initial={{ scaleX: 0 }}
+                animate={bunlarinHepsiRightLineControl}
+                variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                        scaleX: 1,
+                        transition: { duration: 0.8, ease: "easeOut" }
+                    }
+                }}
+            />
         </motion.div >
     );
 };
