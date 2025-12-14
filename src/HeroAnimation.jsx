@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import logo from './assets/logo.png';
 import logo2 from './assets/logo2.png';
 import ajansLogo from '../ajans.png';
@@ -19,12 +19,13 @@ const HeroAnimation = () => {
     const [useSonraFont, setUseSonraFont] = useState(false);
 
     // Words that cycle through - 5 complete loops (3 decreasing + 2 fixed)
+    // GERÇEK only appears in first loop, STRES removed from all loops
     const cyclingWords = [
-        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
-        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
-        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
-        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS',
-        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'STRES', 'YALNIZLIK', 'KAOS'
+        'GERÇEK', 'YÜK', 'BELIRSIZLIK', 'YALNIZLIK', 'KAOS',
+        'YÜK', 'BELIRSIZLIK', 'YALNIZLIK', 'KAOS',
+        'YÜK', 'BELIRSIZLIK', 'YALNIZLIK', 'KAOS',
+        'YÜK', 'BELIRSIZLIK', 'YALNIZLIK', 'KAOS',
+        'YÜK', 'BELIRSIZLIK', 'YALNIZLIK', 'KAOS'
     ];
     const logoControls = useAnimation();
     const hControl = useAnimation();
@@ -434,19 +435,19 @@ const HeroAnimation = () => {
 
             // Start cycling through words immediately
 
-            // Cycle through all words (30 total - 5 loops of 6 words)
-            // First 3 loops (words 1-17): delay decreases from 1000ms to 250ms
-            // Last 2 loops (words 18-29): fixed at 250ms
-            for (let i = 1; i < 30; i++) {
+            // Cycle through all words (21 total - 5 loops: 5+4+4+4+4 words)
+            // First 17 words: delay decreases from 1000ms to 250ms
+            // Words 18-20: fixed at 250ms
+            for (let i = 1; i < 21; i++) {
                 let delay;
                 if (i < 18) {
-                    // First 3 loops: gradually decrease from 1000ms to 250ms
+                    // First 17 words: gradually decrease from 1000ms to 250ms
                     const startDelay = 1000;
                     const endDelay = 250;
                     const totalSteps = 17;
                     delay = startDelay - ((startDelay - endDelay) / (totalSteps - 1)) * (i - 1);
                 } else {
-                    // Last 2 loops: fixed at 250ms
+                    // Words 18-20: fixed at 250ms
                     delay = 250;
                 }
                 await new Promise(resolve => setTimeout(resolve, delay));
@@ -566,6 +567,7 @@ const HeroAnimation = () => {
                                                                         setTimeout(() => {
                                                                             urunleriOptimizeControl.start("visible");
                                                                             analizEtRightLineControl.start("shrinkRight");
+                                                                            // New right line appears 0.5s after text
                                                                             setTimeout(() => {
                                                                                 urunleriOptimizeRightLineControl.start("visible");
                                                                                 // After Ürünleri optimize et, start Stoku planla transition
@@ -576,97 +578,56 @@ const HeroAnimation = () => {
                                                                                         setTimeout(() => {
                                                                                             stokuPlanlaControl.start("visible");
                                                                                             urunleriOptimizeRightLineControl.start("shrinkRight");
+                                                                                            // New right line appears 0.5s after text
                                                                                             setTimeout(() => {
                                                                                                 stokuPlanlaRightLineControl.start("visible");
-                                                                                                // After Stoku planla, start Sosyal medyayı hazırla transition
+                                                                                                // After Stoku planla, go directly to Bunların hepsini
                                                                                                 setTimeout(() => {
                                                                                                     stokuPlanlaControl.start("exitLeft");
                                                                                                     setTimeout(() => {
                                                                                                         stokuPlanlaRightLineControl.start("slideLeft");
                                                                                                         setTimeout(() => {
-                                                                                                            sosyalMedyaHazirlaControl.start("visible");
                                                                                                             stokuPlanlaRightLineControl.start("shrinkRight");
+                                                                                                            // Text appears 0.5s after shrink completes (0.8s)
                                                                                                             setTimeout(() => {
-                                                                                                                sosyalMedyaHazirlaRightLineControl.start("visible");
-                                                                                                                // After Sosyal medyayı hazırla, start Süreci takip et transition
+                                                                                                                bunlarinHepsiControl.start("visible");
+                                                                                                                // After bunlarinHepsi is visible for 1s, swap "Bunların hepsini" with "Sen istersen"
                                                                                                                 setTimeout(() => {
-                                                                                                                    sosyalMedyaHazirlaControl.start("exitLeft");
+                                                                                                                    senIstersenControl.start("exitUp"); // This triggers both exit and entry
                                                                                                                     setTimeout(() => {
-                                                                                                                        sosyalMedyaHazirlaRightLineControl.start("slideLeft");
+                                                                                                                        senIstersenControl.start("visible");
+                                                                                                                        // After Sen istersen is visible for 1s, slide it left to disappear and yosuun yapar. moves to center
                                                                                                                         setTimeout(() => {
-                                                                                                                            sureciTakipControl.start("visible");
-                                                                                                                            sosyalMedyaHazirlaRightLineControl.start("shrinkRight");
+                                                                                                                            senIstersenControl.start("exitLeft");
+                                                                                                                            yosuunYaparControl.start("slideToCenter");
+                                                                                                                            yaparControl.start("slideToCenter"); // yapar. also slides left with yosuun
+                                                                                                                            // Logo appears after slide completes (0.4s)
                                                                                                                             setTimeout(() => {
-                                                                                                                                sureciTakipRightLineControl.start("visible");
-                                                                                                                                // After Süreci takip et, start Detaylı raporla transition
+                                                                                                                                finalLogoControl2.start("visible");
+                                                                                                                                // yapar. exits right, logo and yosuun slide right to center 0.1s after logo appears
                                                                                                                                 setTimeout(() => {
-                                                                                                                                    sureciTakipControl.start("exitLeft");
+                                                                                                                                    yaparControl.start("exitRight");
+                                                                                                                                    yosuunYaparControl.start("slideRight"); // yosuun slides right to center
+                                                                                                                                    finalLogoControl2.start("slideRight"); // logo slides right to center
+                                                                                                                                    // After slideRight completes (0.4s), show yosuun-text.png sliding up
                                                                                                                                     setTimeout(() => {
-                                                                                                                                        sureciTakipRightLineControl.start("slideLeft");
+                                                                                                                                        yosuunTextControl.start("visible");
+                                                                                                                                        // After yosuun-text appears, yosuun slides up and disappears (same as Bunların hepsini)
                                                                                                                                         setTimeout(() => {
-                                                                                                                                            detayliRaporlaControl.start("visible");
-                                                                                                                                            sureciTakipRightLineControl.start("shrinkRight");
+                                                                                                                                            yosuunYaparControl.start("exitUp");
+                                                                                                                                            // After all animations complete, scale up logo and yosuun-text by 10%
                                                                                                                                             setTimeout(() => {
-                                                                                                                                                detayliRaporlaRightLineControl.start("visible");
-                                                                                                                                                // After Detaylı raporla, start Bunların hepsini Yosuun yapar. transition
-                                                                                                                                                setTimeout(() => {
-                                                                                                                                                    detayliRaporlaControl.start("exitLeft");
-                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                        detayliRaporlaRightLineControl.start("slideLeft");
-                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                            detayliRaporlaRightLineControl.start("shrinkRight");
-                                                                                                                                                            // Text appears 0.5s after shrink completes (0.8s)
-                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                bunlarinHepsiControl.start("visible");
-                                                                                                                                                                // After bunlarinHepsi is visible for 1s, swap "Bunların hepsini" with "Sen istersen"
-                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                    senIstersenControl.start("exitUp"); // This triggers both exit and entry
-                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                        senIstersenControl.start("visible");
-                                                                                                                                                                        // After Sen istersen is visible for 1s, slide it left to disappear and yosuun yapar. moves to center
-                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                            senIstersenControl.start("exitLeft");
-                                                                                                                                                                            yosuunYaparControl.start("slideToCenter");
-                                                                                                                                                                            yaparControl.start("slideToCenter"); // yapar. also slides left with yosuun
-                                                                                                                                                                            // Logo appears after slide completes (0.4s)
-                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                finalLogoControl2.start("visible");
-                                                                                                                                                                                // yapar. exits right, logo and yosuun slide right to center 0.1s after logo appears
-                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                    yaparControl.start("exitRight");
-                                                                                                                                                                                    yosuunYaparControl.start("slideRight"); // yosuun slides right to center
-                                                                                                                                                                                    finalLogoControl2.start("slideRight"); // logo slides right to center
-                                                                                                                                                                                    // After slideRight completes (0.4s), show yosuun-text.png sliding up
-                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                        yosuunTextControl.start("visible");
-                                                                                                                                                                                        // After yosuun-text appears, yosuun slides up and disappears (same as Bunların hepsini)
-                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                            yosuunYaparControl.start("exitUp");
-                                                                                                                                                                                            // After all animations complete, scale up logo and yosuun-text by 10%
-                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                finalLogoControl2.start("scaleUp");
-                                                                                                                                                                                                yosuunTextControl.start("scaleUp");
-                                                                                                                                                                                            }, 400);
-                                                                                                                                                                                        }, 50);
-                                                                                                                                                                                    }, 400);
-                                                                                                                                                                                }, 100);
-                                                                                                                                                                            }, 400);
-                                                                                                                                                                        }, 1000);
-                                                                                                                                                                    }, 50);
-                                                                                                                                                                }, 1000);
-                                                                                                                                                            }, 1300);
-                                                                                                                                                        }, 600);
-                                                                                                                                                    }, 150);
-                                                                                                                                                }, 800);
-                                                                                                                                            }, 500);
-                                                                                                                                        }, 600);
-                                                                                                                                    }, 150);
-                                                                                                                                }, 800);
-                                                                                                                            }, 500);
-                                                                                                                        }, 600);
-                                                                                                                    }, 150);
-                                                                                                                }, 800);
-                                                                                                            }, 500);
+                                                                                                                                                finalLogoControl2.start("scaleUp");
+                                                                                                                                                yosuunTextControl.start("scaleUp");
+                                                                                                                                            }, 400);
+                                                                                                                                        }, 50);
+                                                                                                                                    }, 400);
+                                                                                                                                }, 100);
+                                                                                                                            }, 400);
+                                                                                                                        }, 1000);
+                                                                                                                    }, 50);
+                                                                                                                }, 1000);
+                                                                                                            }, 1300);
                                                                                                         }, 600);
                                                                                                     }, 150);
                                                                                                 }, 800);
@@ -2007,17 +1968,18 @@ const HeroAnimation = () => {
                         }
                     }}
                 >
-                    <motion.span
-                        key={currentWordIndex}
-                        className="inline-block"
-                        style={{ fontFamily: '"Permanent Marker", cursive', color: '#78F666' }}
-                        initial={{ y: 100, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -100, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                    >
-                        {cyclingWords[currentWordIndex]}
-                    </motion.span>
+                    <AnimatePresence mode="wait">
+                        <motion.span
+                            key={currentWordIndex}
+                            className="inline-block"
+                            style={{ fontFamily: '"Permanent Marker", cursive', color: '#78F666' }}
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1, transition: { duration: 0.2, ease: "easeOut" } }}
+                            exit={{ y: -50, transition: { duration: 0.1 } }}
+                        >
+                            {cyclingWords[currentWordIndex]}
+                        </motion.span>
+                    </AnimatePresence>
                 </motion.div>
             )}
 
@@ -2477,7 +2439,7 @@ const HeroAnimation = () => {
                                     transition: { duration: 0.3, ease: "easeOut", delay: 0 }
                                 }
                             }}
-                        >Mağazaları</motion.span>
+                        >Zamanı</motion.span>
                         <motion.span
                             style={{ marginLeft: '0.3em' }}
                             initial={{ y: -50, opacity: 0 }}
@@ -2489,7 +2451,7 @@ const HeroAnimation = () => {
                                     transition: { duration: 0.3, ease: "easeOut", delay: 0.15 }
                                 }
                             }}
-                        >bağla</motion.span>
+                        >okur</motion.span>
                     </motion.div>
                     {/* Green line extending to the right - positioned at the end of text */}
                     <motion.div
@@ -2544,7 +2506,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Tek ekranda gör
+                Rakipleri kıyaslar
             </motion.div>
 
             {/* Right-side green line extending from text to right edge */}
@@ -2597,7 +2559,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Rakipleri izle
+                Aksiyon üretir
             </motion.div>
 
             {/* Rakipleri izle right-side green line */}
@@ -2650,7 +2612,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Analiz et
+                Satışa Hazırlar
             </motion.div>
 
             {/* Analiz et right-side green line */}
@@ -2703,7 +2665,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Ürünü parlat
+                Süreci izler
             </motion.div>
 
             {/* Ürünleri optimize et right-side green line */}
@@ -2756,7 +2718,7 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Stoku planla
+                Öğrenir & Raporlar
             </motion.div>
 
             {/* Stoku planla right-side green line */}
@@ -2779,7 +2741,7 @@ const HeroAnimation = () => {
                         transition: { duration: 0.8, ease: "easeOut" }
                     },
                     slideLeft: {
-                        x: '-137vw',
+                        x: '-200vw',
                         transition: { duration: 0.6, ease: "easeIn" }
                     },
                     shrinkRight: {
@@ -2938,7 +2900,7 @@ const HeroAnimation = () => {
                         transition: { duration: 0.8, ease: "easeOut" }
                     },
                     slideLeft: {
-                        x: '-137vw',
+                        x: '-200vw',
                         transition: { duration: 0.6, ease: "easeIn" }
                     },
                     shrinkRight: {
