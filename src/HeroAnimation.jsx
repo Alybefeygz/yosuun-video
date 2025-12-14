@@ -6,6 +6,7 @@ import ajansLogo from '../ajans.png';
 import girisimciLogo from '../girişimci.png';
 import saticiLogo from '../satıcı.png';
 import handImage from './assets/hand.png';
+import yosuunTextImage from './assets/yosuun-text.png';
 
 const HeroAnimation = () => {
     const [useLogo2, setUseLogo2] = useState(false);
@@ -75,6 +76,11 @@ const HeroAnimation = () => {
     const detayliRaporlaRightLineControl = useAnimation(); // Control for Detaylı raporla right line
     const bunlarinHepsiControl = useAnimation(); // Control for 'Bunların hepsini Yosuun yapar.' text
     const bunlarinHepsiRightLineControl = useAnimation(); // Control for final right line
+    const senIstersenControl = useAnimation(); // Control for 'Sen istersen' text
+    const yosuunYaparControl = useAnimation(); // Control for 'yosuun yapar.' text slide to center
+    const yaparControl = useAnimation(); // Control for 'yapar.' text slide right and disappear
+    const finalLogoControl2 = useAnimation(); // Control for final logo that appears when Sen istersen disappears
+    const yosuunTextControl = useAnimation(); // Control for yosuun-text.png image slide up
 
     const onuControl = useAnimation();
     const yaptikControl = useAnimation(); // Control for 'yaptık'
@@ -612,6 +618,42 @@ const HeroAnimation = () => {
                                                                                                                                                             // Text appears 0.5s after shrink completes (0.8s)
                                                                                                                                                             setTimeout(() => {
                                                                                                                                                                 bunlarinHepsiControl.start("visible");
+                                                                                                                                                                // After bunlarinHepsi is visible for 1s, swap "Bunların hepsini" with "Sen istersen"
+                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                    senIstersenControl.start("exitUp"); // This triggers both exit and entry
+                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                        senIstersenControl.start("visible");
+                                                                                                                                                                        // After Sen istersen is visible for 1s, slide it left to disappear and yosuun yapar. moves to center
+                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                            senIstersenControl.start("exitLeft");
+                                                                                                                                                                            yosuunYaparControl.start("slideToCenter");
+                                                                                                                                                                            yaparControl.start("slideToCenter"); // yapar. also slides left with yosuun
+                                                                                                                                                                            // Logo appears after slide completes (0.4s)
+                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                finalLogoControl2.start("visible");
+                                                                                                                                                                                // yapar. exits right, logo and yosuun slide right to center 0.1s after logo appears
+                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                    yaparControl.start("exitRight");
+                                                                                                                                                                                    yosuunYaparControl.start("slideRight"); // yosuun slides right to center
+                                                                                                                                                                                    finalLogoControl2.start("slideRight"); // logo slides right to center
+                                                                                                                                                                                    // After slideRight completes (0.4s), show yosuun-text.png sliding up
+                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                        yosuunTextControl.start("visible");
+                                                                                                                                                                                        // After yosuun-text appears, yosuun slides up and disappears (same as Bunların hepsini)
+                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                            yosuunYaparControl.start("exitUp");
+                                                                                                                                                                                            // After all animations complete, scale up logo and yosuun-text by 10%
+                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                finalLogoControl2.start("scaleUp");
+                                                                                                                                                                                                yosuunTextControl.start("scaleUp");
+                                                                                                                                                                                            }, 400);
+                                                                                                                                                                                        }, 50);
+                                                                                                                                                                                    }, 400);
+                                                                                                                                                                                }, 100);
+                                                                                                                                                                            }, 400);
+                                                                                                                                                                        }, 1000);
+                                                                                                                                                                    }, 50);
+                                                                                                                                                                }, 1000);
                                                                                                                                                             }, 1300);
                                                                                                                                                         }, 600);
                                                                                                                                                     }, 150);
@@ -2907,7 +2949,7 @@ const HeroAnimation = () => {
                 }}
             />
 
-            {/* Bunların hepsini Yosuun yapar. text */}
+            {/* Bunların hepsini yosuun yapar. container */}
             <motion.div
                 className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold text-black"
                 initial="hidden"
@@ -2921,8 +2963,140 @@ const HeroAnimation = () => {
                     }
                 }}
             >
-                Bunların hepsini Yosuun yapar.
+                <div className="relative overflow-hidden">
+                    {/* Bunların hepsini - will exit up */}
+                    <motion.span
+                        animate={senIstersenControl}
+                        variants={{
+                            hidden: { y: 0 },
+                            exitUp: {
+                                y: -100,
+                                opacity: 0,
+                                transition: { duration: 0.3, ease: "easeIn" }
+                            }
+                        }}
+                        className="inline-block"
+                    >
+                        Bunların hepsini
+                    </motion.span>
+                    {/* Sen istersen - comes from below */}
+                    <motion.span
+                        className="absolute right-0 top-0 inline-block text-right"
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={senIstersenControl}
+                        variants={{
+                            hidden: { y: 100, opacity: 0 },
+                            visible: {
+                                y: 0,
+                                opacity: 1,
+                                transition: { duration: 0.3, ease: "easeOut" }
+                            },
+                            exitLeft: {
+                                x: -150,
+                                opacity: 0,
+                                transition: { duration: 0.4, ease: "easeOut" }
+                            }
+                        }}
+                    >
+                        Sen istersen
+                    </motion.span>
+                </div>
+                <motion.span
+                    animate={yosuunYaparControl}
+                    variants={{
+                        initial: { x: 0, y: 0, opacity: 1 },
+                        slideToCenter: {
+                            x: -150,
+                            transition: { duration: 0.4, ease: "easeOut" }
+                        },
+                        slideRight: {
+                            x: -75,
+                            transition: { duration: 0.4, ease: "easeOut" }
+                        },
+                        exitUp: {
+                            y: -100,
+                            opacity: 0,
+                            transition: { duration: 0.3, ease: "easeIn" }
+                        }
+                    }}
+                >
+                    &nbsp;yosuun
+                </motion.span>
+                <motion.span
+                    animate={yaparControl}
+                    variants={{
+                        initial: { x: 0, opacity: 1 },
+                        slideToCenter: {
+                            x: -150,
+                            transition: { duration: 0.4, ease: "easeOut" }
+                        },
+                        exitRight: {
+                            x: 0,
+                            opacity: 0,
+                            transition: { duration: 0.4, ease: "easeOut" }
+                        }
+                    }}
+                >
+                    &nbsp;yapar.
+                </motion.span>
             </motion.div>
+
+            {/* Final logo that appears when Sen istersen disappears - positioned absolutely */}
+            <motion.img
+                src={logo}
+                alt="Logo"
+                className="h-40 md:h-64 object-contain absolute"
+                style={{ left: 'calc(50% - 320px)', top: '50%', transform: 'translateY(-50%)' }}
+                initial={{ opacity: 0 }}
+                animate={finalLogoControl2}
+                variants={{
+                    hidden: { opacity: 0, x: 0, y: '-50%', scale: 1 },
+                    visible: {
+                        opacity: 1,
+                        x: 0,
+                        y: '-50%',
+                        scale: 1,
+                        transition: { duration: 0 }
+                    },
+                    slideRight: {
+                        x: 75,
+                        y: '-50%',
+                        scale: 1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    },
+                    scaleUp: {
+                        x: 75,
+                        y: '-50%',
+                        scale: 1.1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    }
+                }}
+            />
+
+            {/* yosuun-text.png - slides up from below to center */}
+            <motion.img
+                src={yosuunTextImage}
+                alt="Yosuun Text"
+                className="absolute object-contain"
+                style={{ left: '46%', top: '35.5%', transform: 'translate(-50%, -50%)', width: '17%' }}
+                initial={{ opacity: 0, y: 100 }}
+                animate={yosuunTextControl}
+                variants={{
+                    hidden: { opacity: 0, y: 100, scale: 1 },
+                    visible: {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        transition: { duration: 0.3, ease: "easeOut" }
+                    },
+                    scaleUp: {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1.1,
+                        transition: { duration: 0.4, ease: "easeOut" }
+                    }
+                }}
+            />
         </motion.div >
     );
 };
