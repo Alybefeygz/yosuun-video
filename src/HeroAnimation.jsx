@@ -75,7 +75,7 @@ const HeroAnimation = () => {
     const sureciTakipRightLineControl = useAnimation(); // Control for Süreci takip et right line
     const detayliRaporlaControl = useAnimation(); // Control for 'Detaylı raporla' text
     const detayliRaporlaRightLineControl = useAnimation(); // Control for Detaylı raporla right line
-    const bunlarinHepsiControl = useAnimation(); // Control for 'Bunların hepsini Yosuun yapar.' text
+    const bunlarinHepsiControl = useAnimation(); // Control for 'Bunların hepsini O yapar.' text
     const bunlarinHepsiRightLineControl = useAnimation(); // Control for final right line
     const senIstersenControl = useAnimation(); // Control for 'Sen istersen' text
     const yosuunYaparControl = useAnimation(); // Control for 'yosuun yapar.' text slide to center
@@ -605,8 +605,8 @@ const HeroAnimation = () => {
                                                                                                                         // After Sen istersen is visible for 1s, slide it left to disappear and yosuun yapar. moves to center
                                                                                                                         setTimeout(() => {
                                                                                                                             senIstersenControl.start("exitLeft");
-                                                                                                                            yosuunYaparControl.start("slideToCenter");
-                                                                                                                            yaparControl.start("slideToCenter"); // yapar. also slides left with yosuun
+                                                                                                                            yosuunYaparControl.start("exitLeft"); // o also exits left like Sen istersen
+                                                                                                                            yaparControl.start("slideToCenter"); // yapar. only slides left, stays visible
                                                                                                                             // Logo appears after slide completes (0.4s)
                                                                                                                             setTimeout(() => {
                                                                                                                                 finalLogoControl2.start("visible");
@@ -2976,6 +2976,11 @@ const HeroAnimation = () => {
                     animate={yosuunYaparControl}
                     variants={{
                         initial: { x: 0, y: 0, opacity: 1 },
+                        exitLeft: {
+                            x: -150,
+                            opacity: 0,
+                            transition: { duration: 0.4, ease: "easeOut" }
+                        },
                         slideToCenter: {
                             x: -150,
                             transition: { duration: 0.4, ease: "easeOut" }
@@ -2991,15 +2996,16 @@ const HeroAnimation = () => {
                         }
                     }}
                 >
-                    &nbsp;yosuun
+                    &nbsp;o
                 </motion.span>
                 <motion.span
                     animate={yaparControl}
                     variants={{
                         initial: { x: 0, opacity: 1 },
                         slideToCenter: {
-                            x: -150,
-                            transition: { duration: 0.4, ease: "easeOut" }
+                            x: -300,
+                            opacity: 1,
+                            transition: { duration: 0.8, ease: "easeOut" }
                         },
                         exitRight: {
                             x: 0,
