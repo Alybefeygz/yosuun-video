@@ -54,7 +54,7 @@ const HeroAnimation = () => {
     const artikOndaControl = useAnimation(); // Control for 'artık onda.' combined (for initial animations)
     const handControl = useAnimation(); // Control for hand image
     const handLinesControl = useAnimation(); // Control for decorative lines around hand
-    const bundanSonraControl = useAnimation(); // Control for 'Bundan sonra iş böyle ilerler' text
+    const bundanSonraControl = useAnimation(); // Control for 'Bundan sonra iş şöyle ilerler' text
     const magazalarBaglaControl = useAnimation(); // Control for 'Mağazaları bağla' container
     const magazalarTextControl = useAnimation(); // Control for 'Mağazaları bağla' text only
     const magazalarLineControl = useAnimation(); // Control for green line
@@ -299,7 +299,7 @@ const HeroAnimation = () => {
             icinControl.start("visible");
 
             // 10. Wait and then instantly vanish all "Her şeyi yapmak için" text
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for text to be visible
+            await new Promise(resolve => setTimeout(resolve, 500)); // Wait for text to be visible
             herControl.start("instantVanish");
             seControl.start("instantVanish");
             yiControl.start("instantVanish");
@@ -309,7 +309,7 @@ const HeroAnimation = () => {
 
             // 11. Final sequence: Logo -> Ekosistem slides right -> Tek slides left
             // Logo appears first
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 0));
             finalLogoControl.start("visible");
 
             // Ekosistem slides from behind logo to the right
@@ -361,6 +361,32 @@ const HeroAnimation = () => {
             // Wait for Rapor exit animation to complete
             await new Promise(resolve => setTimeout(resolve, 300));
 
+            // Background turns black for "kim olursan ol" animation
+            bgControl.start("black");
+
+            // "kim olursan ol" appears letter by letter in center
+            await new Promise(resolve => setTimeout(resolve, 300));
+            kimOlursanOlControl.start("visible");
+
+            // Wait for all letters to appear (14 chars * 80ms = ~1120ms), then slide container left and show logo
+            await new Promise(resolve => setTimeout(resolve, 1200));
+            kimOlursanOlControl.start("slideLeft");
+            ajansLogoControl.start("visible");
+
+            // Wait 1 second then switch to girişimci logo
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setUseGirisimci(true);
+
+            // Wait 1 second then switch to satıcı logo
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setUseSatici(true);
+
+            // Wait 1 second then vanish everything and change background to white
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            kimOlursanOlControl.start("instantVanish");
+            ajansLogoControl.start("instantVanish");
+            bgControl.start("white");
+
             // "tek başına" segments appear one by one from right, pushing previous to left
             // First: "te" appears
             tekBasinaTeControl.start("visible");
@@ -402,33 +428,13 @@ const HeroAnimation = () => {
             leftParenControl.start("visible");
             rightParenControl.start("visible");
 
-            // Wait for scale animation to complete (0.5s), then vanish instantly
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Wait for scale animation to complete (0.9s), then vanish instantly
+            await new Promise(resolve => setTimeout(resolve, 900));
             senYapiyorsunControl.start("instantVanish");
             leftParenControl.start("instantVanish");
             rightParenControl.start("instantVanish");
 
-            // "kim olursan ol" appears letter by letter in center
-            await new Promise(resolve => setTimeout(resolve, 300));
-            kimOlursanOlControl.start("visible");
-
-            // Wait for all letters to appear (14 chars * 80ms = ~1120ms), then slide container left and show logo
-            await new Promise(resolve => setTimeout(resolve, 1200));
-            kimOlursanOlControl.start("slideLeft");
-            ajansLogoControl.start("visible");
-
-            // Wait 1 second then switch to girişimci logo
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setUseGirisimci(true);
-
-            // Wait 1 second then switch to satıcı logo
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setUseSatici(true);
-
-            // Wait 1 second then vanish everything and change background to white
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            kimOlursanOlControl.start("instantVanish");
-            ajansLogoControl.start("instantVanish");
+            // Background changes to white for next phase
             bgControl.start("white");
             buYasadiginControl.start("visible");
             setShowCyclingWords(true);
@@ -507,7 +513,7 @@ const HeroAnimation = () => {
             // Wait for exit animation to complete, then background turns green instantly
             await new Promise(resolve => setTimeout(resolve, 300));
             bgControl.start("green");
-            bundanSonraControl.start("visible"); // Show 'Bundan sonra iş böyle ilerler' text
+            bundanSonraControl.start("visible"); // Show 'Bundan sonra iş şöyle ilerler' text
             // Change sonra font to Permanent Marker at 1.1s (same time as color change)
             setTimeout(() => setUseSonraFont(true), 1100);
             // After all animations complete (1.7s), make everything disappear instantly and change background to white
@@ -588,7 +594,7 @@ const HeroAnimation = () => {
                                                                                                         stokuPlanlaRightLineControl.start("slideLeft");
                                                                                                         setTimeout(() => {
                                                                                                             stokuPlanlaRightLineControl.start("shrinkRight");
-                                                                                                            // Text appears 0.5s after shrink completes (0.8s)
+                                                                                                            // Text appears immediately after shrink completes (0.8s)
                                                                                                             setTimeout(() => {
                                                                                                                 bunlarinHepsiControl.start("visible");
                                                                                                                 // After bunlarinHepsi is visible for 1s, swap "Bunların hepsini" with "Sen istersen"
@@ -627,7 +633,7 @@ const HeroAnimation = () => {
                                                                                                                         }, 1000);
                                                                                                                     }, 50);
                                                                                                                 }, 1000);
-                                                                                                            }, 1300);
+                                                                                                            }, 800);
                                                                                                         }, 600);
                                                                                                     }, 150);
                                                                                                 }, 800);
@@ -1973,8 +1979,11 @@ const HeroAnimation = () => {
                             key={currentWordIndex}
                             className="inline-block"
                             style={{ fontFamily: '"Permanent Marker", cursive', color: '#78F666' }}
-                            initial={{ y: 50, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1, transition: { duration: 0.2, ease: "easeOut" } }}
+                            initial={currentWordIndex === 0 ? { opacity: 0 } : { y: 50, opacity: 0 }}
+                            animate={currentWordIndex === 0
+                                ? { opacity: 1, transition: { duration: 0 } }
+                                : { y: 0, opacity: 1, transition: { duration: 0.2, ease: "easeOut" } }
+                            }
                             exit={{ y: -50, transition: { duration: 0.1 } }}
                         >
                             {cyclingWords[currentWordIndex]}
@@ -2270,7 +2279,7 @@ const HeroAnimation = () => {
                     onda.
                 </motion.span>
             </div>
-            {/* 'Bundan sonra iş böyle ilerler' text - appears with staggered slide-in animation on green background */}
+            {/* 'Bundan sonra iş şöyle ilerler' text - appears with staggered slide-in animation on green background */}
             <motion.div
                 className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl font-bold"
                 initial="hidden"
@@ -2380,7 +2389,7 @@ const HeroAnimation = () => {
                             }
                         }
                     }}
-                >böyle</motion.span>
+                >şöyle</motion.span>
                 <motion.span
                     style={{ marginLeft: '0.3em' }}
                     initial={{ x: 75, opacity: 0, color: "#000000" }}
